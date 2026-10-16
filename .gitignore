@@ -1,0 +1,14 @@
+.DS_Store
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+backend/.env
+backend/eval-results/
+backend/data/chroma/
+backend/models/
+frontend/node_modules/
+frontend/dist/
+*.ses
+ai-employees/
+my-agents/

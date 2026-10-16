@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universal AI Contact Centre | Chat Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0d14;
+      --bg-card: #121726;
+      --bg-card-subtle: #182035;
+      --bg-hover: #1f2a45;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(99, 102, 241, 0.5);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-glow: rgba(99, 102, 241, 0.25);
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.08) 0%, transparent 40%);
+    }
+
+    /* Top Bar */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(18, 23, 38, 0.7);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--primary), #a855f7);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .brand h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand span {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .controls-top {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+
+    select {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0.55rem 2rem 0.55rem 0.85rem;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      appearance: none;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    select:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 2px var(--primary-glow);
+    }
+
+    .select-wrapper::after {
+      content: '▾';
+      position: absolute;
+      right: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.35rem 0.75rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-dim);
+    }
+
+    .status-badge.connected .status-dot {
+      background: var(--accent-emerald);
+      box-shadow: 0 0 8px var(--accent-emerald);
+    }
+
+    .status-badge.connecting .status-dot {
+      background: var(--accent-amber);
+      animation: pulse 1s infinite alternate;
+    }
+
+    .btn {
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 0.55rem 1.1rem;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-hover);
+    }
+
+    /* Main Grid Layout */
+    .app-container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 1.5rem;
+      max-width: 1560px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 1.5rem 2rem;
+    }
+
+    /* Chat & Voice Center Section */
+    .main-panel {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    /* Call / Voice Banner */
+    .voice-banner {
+      background: linear-gradient(180deg, rgba(99, 102, 241, 0.08) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .voice-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .voice-avatar {
+      width: 44px;
+      height: 44px;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      position: relative;
+    }
+
+    .voice-avatar.speaking::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border: 2px solid var(--accent-emerald);
+      border-radius: 50%;
+      animation: ripple 1.2s infinite ease-out;
+    }
+
+    .voice-text h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .voice-text p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .audio-visualizer {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 24px;
+    }
+
+    .waveform-bar {
+      width: 3px;
+      background: var(--primary);
+      border-radius: 2px;
+      height: 6px;
+      transition: height 0.1s ease;
+    }
+
+    /* Message Flow */
+    .transcript-container {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      min-height: 420px;
+      max-height: calc(100vh - 360px);
+    }
+
+    .msg-group {
+      display: flex;
+      flex-direction: column;
+      max-width: 82%;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .msg-group.user {
+      align-self: flex-end;
+    }
+
+    .msg-group.assistant {
+      align-self: flex-start;
+    }
+
+    .msg-meta {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .msg-bubble {
+      padding: 0.9rem 1.15rem;
+      border-radius: 14px;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      position: relative;
+      word-break: break-word;
+    }
+
+    .msg-group.user .msg-bubble {
+      background: linear-gradient(135deg, var(--primary), #4f46e5);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .msg-group.assistant .msg-bubble {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg-group.error .msg-bubble {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      color: #fda4af;
+    }
+
+    /* Inline Tool Invocation Pill */
+    .tool-pill {
+      margin-top: 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.35rem 0.65rem;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: #34d399;
+    }
+
+    /* Input Bar */
+    .input-bar {
+      padding: 1.25rem 1.5rem;
+      background: var(--bg-card-subtle);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .input-bar input {
+      flex: 1;
+      background: var(--bg-dark);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 0.85rem 1.1rem;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .input-bar input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 2px var(--primary-glow);
+    }
+
+    .btn-mic {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-mic:hover {
+      color: var(--text-main);
+      border-color: var(--border-focus);
+    }
+
+    .btn-mic.recording {
+      background: var(--accent-rose);
+      color: #fff;
+      border-color: var(--accent-rose);
+      animation: pulse 1s infinite alternate;
+    }
+
+    /* Side Telemetry & Business Inspector */
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 1.25rem;
+    }
+
+    .card h3 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: var(--text-dim); }
+    .info-value { color: var(--text-main); font-weight: 500; font-family: var(--font-mono); }
+
+    /* Live Tool Invocation Log */
+    .tool-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .tool-log-item {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      padding: 0.65rem 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+
+    .tool-log-header {
+      display: flex;
+      justify-content: space-between;
+      color: #38bdf8;
+      margin-bottom: 0.35rem;
+    }
+
+    .tool-log-detail {
+      color: var(--text-muted);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* Keyframes */
+    @keyframes pulse {
+      from { transform: scale(1); opacity: 0.9; }
+      to { transform: scale(1.06); opacity: 1; }
+    }
+
+    @keyframes ripple {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1024px) {
+      .app-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🎙️</div>
+      <div>
+        <h1>Universal AI Contact Centre</h1>
+        <span>Receptionist and document comparison chats</span>
+      </div>
+    </div>
+
+    <div class="controls-top">
+      <div class="select-wrapper">
+        <select id="businessSelect" aria-label="Select a chat persona">
+          <option value="hua_lu_peking_duck">Hua Lu Peking Duck (Restaurant)</option>
+          <option value="apex_auto_works">Apex Auto Works (Auto Mechanic)</option>
+          <option value="insurance_comparison">Insurance Comparison</option>
+          <option value="credit_card_comparison">Credit Card Comparison</option>
+        </select>
+      </div>
+
+      <div id="statusBadge" class="status-badge">
+        <span class="status-dot"></span>
+        <span id="statusText">Disconnected</span>
+      </div>
+
+      <button id="connectBtn" class="btn btn-primary">Connect</button>
+    </div>
+  </header>
+
+  <!-- Application Main Body -->
+  <div class="app-container">
+    
+    <!-- Central Chat / Voice Console -->
+    <main class="main-panel">
+      
+      <!-- Voice Live Banner -->
+      <section class="voice-banner">
+        <div class="voice-info">
+          <div id="voiceAvatar" class="voice-avatar">🤖</div>
+          <div class="voice-text">
+            <h2 id="agentNameDisplay">AI Receptionist</h2>
+            <p id="agentStatusDisplay">Ready to accept caller interactions</p>
+          </div>
+        </div>
+
+        <div class="audio-visualizer" id="visualizer">
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+        </div>
+      </section>
+
+      <!-- Message & Transcript Stream -->
+      <div id="transcript" class="transcript-container" aria-live="polite">
+        <div class="msg-group assistant">
+          <div class="msg-meta">SYSTEM</div>
+          <div class="msg-bubble">Select a chat persona and click <strong>Connect</strong> to start a conversation.</div>
+        </div>
+      </div>
+
+      <!-- Caller Input Bar -->
+      <form id="inputForm" class="input-bar">
+        <button type="button" id="micBtn" class="btn-mic" title="Browser Audio Voice Mode (Speech-to-Text)">
+          🎙️
+        </button>
+        <input id="messageInput" type="text" placeholder="Type your question…" disabled autocomplete="off">
+        <button type="submit" id="sendBtn" class="btn btn-primary" disabled>
+          Send
+        </button>
+      </form>
+
+    </main>
+
+    <!-- Side Panel: Tenant Configuration & Live Tool Telemetry -->
+    <aside class="side-panel">
+      
+      <!-- Tenant Details Card -->
+      <section class="card">
+        <h3>Selected Chat <span style="font-size: 0.7rem; color: var(--accent-emerald);">● ACTIVE</span></h3>
+        <div class="info-row">
+          <span class="info-label">Persona ID</span>
+          <span id="metaBizId" class="info-value">hua_lu_peking_duck</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Category</span>
+          <span id="metaBizIndustry" class="info-value">Hospitality / Dining</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Active Flow</span>
+          <span id="activeFlow" class="info-value">Booking + KB + Transfer</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Response Channel</span>
+          <span class="info-value">WebSocket Streaming</span>
+        </div>
+      </section>
+
+      <!-- Live Tool Executions Inspector -->
+      <section class="card" id="toolCard">
+        <h3>Tool Invocations <span id="toolCount" style="color: var(--primary);">0</span></h3>
+        <div id="toolFeed" class="tool-feed">
+          <div style="font-size: 0.75rem; color: var(--text-dim); text-align: center; padding: 1.5rem 0;">
+            No tool calls yet. Inquire about availability or bookings to watch function calling in real time.
+          </div>
+        </div>
+      </section>
+
+      <!-- Dynamic 7-Day Availability Card -->
+      <section class="card" id="availabilityCard" style="flex: 1;">
+        <h3>Upcoming Week Availability <span style="font-size: 0.7rem; color: var(--primary);">7-DAY</span></h3>
+        <div id="slotsFeed" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.76rem; font-family: var(--font-mono);">
+          <div style="color: var(--text-dim); text-align: center; padding: 1rem 0;">Loading slots…</div>
+        </div>
+      </section>
+
+    </aside>
+
+  </div>
+
+  <script>
+    const businessSelect = document.getElementById('businessSelect');
+    const connectBtn = document.getElementById('connectBtn');
+    const statusBadge = document.getElementById('statusBadge');
+    const statusText = document.getElementById('statusText');
+    const transcript = document.getElementById('transcript');
+    const inputForm = document.getElementById('inputForm');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const micBtn = document.getElementById('micBtn');
+    const voiceAvatar = document.getElementById('voiceAvatar');
+    const agentNameDisplay = document.getElementById('agentNameDisplay');
+    const agentStatusDisplay = document.getElementById('agentStatusDisplay');
+    const metaBizId = document.getElementById('metaBizId');
+    const metaBizIndustry = document.getElementById('metaBizIndustry');
+    const activeFlow = document.getElementById('activeFlow');
+    const toolFeed = document.getElementById('toolFeed');
+    const toolCount = document.getElementById('toolCount');
+    const toolCard = document.getElementById('toolCard');
+    const availabilityCard = document.getElementById('availabilityCard');
+    const bars = document.querySelectorAll('.waveform-bar');
+
+    let socket = null;
+    let totalTools = 0;
+    let waveInterval = null;
+
+    const tenantInfo = {
+      'hua_lu_peking_duck': { industry: 'Hospitality / Dining', role: 'Hua Lu Reception', flow: 'Booking + KB + Transfer', hasTools: true, hasAvailability: true },
+      'apex_auto_works': { industry: 'Automotive Repair', role: 'Apex Auto Service Advisor', flow: 'Booking + KB + Transfer', hasTools: true, hasAvailability: true },
+      'insurance_comparison': { industry: 'Insurance documents', role: 'Insurance Comparison', flow: 'Local policy document Q&A', hasTools: false, hasAvailability: false },
+      'credit_card_comparison': { industry: 'Banking documents', role: 'Credit Card Comparison', flow: 'Local card-terms Q&A', hasTools: false, hasAvailability: false }
+    };
+
+    function renderSelection(selectedId) {
+      const meta = tenantInfo[selectedId];
+      if (!meta) return;
+      metaBizId.textContent = selectedId;
+      metaBizIndustry.textContent = meta.industry;
+      activeFlow.textContent = meta.flow;
+      agentNameDisplay.textContent = meta.role;
+      toolCard.hidden = !meta.hasTools;
+      availabilityCard.hidden = !meta.hasAvailability;
+      messageInput.placeholder = meta.hasAvailability
+        ? "Type customer inquiry (e.g. 'Can I book a table for 4 tonight at 7?')…"
+        : "Ask a question about the supplied documents…";
+    }
+
+    function animateWaveform(active) {
+      if (!active) {
+        clearInterval(waveInterval);
+        bars.forEach(b => b.style.height = '6px');
+        voiceAvatar.classList.remove('speaking');
+        return;
+      }
+      voiceAvatar.classList.add('speaking');
+      clearInterval(waveInterval);
+      waveInterval = setInterval(() => {
+        bars.forEach(b => {
+          const h = Math.floor(Math.random() * 20) + 4;
+          b.style.height = `${h}px`;
+        });
+      }, 100);
+    }
+
+    function setConnectionState(state, text) {
+      statusBadge.className = `status-badge ${state}`;
+      statusText.textContent = text;
+      const isConnected = state === 'connected';
+      messageInput.disabled = !isConnected;
+      sendBtn.disabled = !isConnected;
+      connectBtn.textContent = isConnected ? 'Disconnect' : 'Connect';
+      connectBtn.className = isConnected ? 'btn btn-outline' : 'btn btn-primary';
+    }
+
+    function addMessage(sender, text, roleClass, tools = []) {
+      const group = document.createElement('div');
+      group.className = `msg-group ${roleClass}`;
+
+      const meta = document.createElement('div');
+      meta.className = 'msg-meta';
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      meta.textContent = `${sender.toUpperCase()} • ${time}`;
+      group.appendChild(meta);
+
+      const bubble = document.createElement('div');
+      bubble.className = 'msg-bubble';
+      bubble.textContent = text;
+
+      if (tools && tools.length > 0) {
+        tools.forEach(tool => {
+          const pill = document.createElement('div');
+          pill.className = 'tool-pill';
+          pill.textContent = `⚡ Executed: ${tool.name}`;
+          bubble.appendChild(document.createElement('br'));
+          bubble.appendChild(pill);
+          logToolExecution(tool);
+        });
+      }
+
+      group.appendChild(bubble);
+      transcript.appendChild(group);
+      transcript.scrollTop = transcript.scrollHeight;
+    }
+
+    function logToolExecution(tool) {
+      if (totalTools === 0) {
+        toolFeed.innerHTML = '';
+      }
+      totalTools++;
+      toolCount.textContent = totalTools;
+
+      const item = document.createElement('div');
+      item.className = 'tool-log-item';
+      
+      const header = document.createElement('div');
+      header.className = 'tool-log-header';
+      header.innerHTML = `<strong>${tool.name}</strong> <span>${new Date().toLocaleTimeString()}</span>`;
+      
+      const detail = document.createElement('div');
+      detail.className = 'tool-log-detail';
+      detail.textContent = JSON.stringify(tool.arguments || {}, null, 2);
+
+      item.appendChild(header);
+      item.appendChild(detail);
+      toolFeed.prepend(item);
+    }
+
+    function handleConnect(reconnect = false) {
+      if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+        if (!reconnect) {
+          socket.close();
+          return;
+        }
+        socket.onclose = null;
+        socket.onerror = null;
+        socket.close();
+        socket = null;
+      }
+
+      const selectedId = businessSelect.value;
+      const meta = tenantInfo[selectedId] || { industry: 'General', role: 'AI Receptionist' };
+      renderSelection(selectedId);
+      metaBizId.textContent = selectedId;
+      metaBizIndustry.textContent = meta.industry;
+
+      setConnectionState('connecting', 'Connecting…');
+      transcript.innerHTML = '';
+      toolFeed.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-dim); text-align: center; padding: 2rem 0;">Awaiting tool calls…</div>';
+      totalTools = 0;
+      toolCount.textContent = '0';
+
+      const host = window.location.hostname || '127.0.0.1';
+      const wsUrl = `ws://${host}:8000/chat/${selectedId}`;
+
+      socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        setConnectionState('connected', 'Live Channel Open');
+      };
+
+      socket.onmessage = (evt) => {
+        try {
+          const payload = JSON.parse(evt.data);
+          if (payload.type === 'session.ready') {
+            agentNameDisplay.textContent = payload.business_name;
+            const documentChat = !meta.hasTools;
+            agentStatusDisplay.textContent = documentChat ? 'Active • Ask about the supplied documents' : 'Active • Ready to take inquiries';
+            const welcome = documentChat
+              ? 'You can ask questions about the supplied policy documents or request a comparison.'
+              : 'You can ask about availability, book appointments, or request information.';
+            addMessage('System', `Connected to ${payload.business_name}. ${welcome}`, 'assistant');
+          } else if (payload.type === 'assistant.message') {
+            animateWaveform(true);
+            setTimeout(() => animateWaveform(false), 1400);
+            addMessage(agentNameDisplay.textContent, payload.text, 'assistant', payload.tools);
+            
+            // Web Speech API Voice Readback (Browser TTS)
+            if ('speechSynthesis' in window && payload.text) {
+              const utterance = new SpeechSynthesisUtterance(payload.text);
+              window.speechSynthesis.speak(utterance);
+            }
+          } else if (payload.type === 'error') {
+            addMessage('Error', payload.message, 'error');
+          }
+        } catch (e) {
+          console.error('Failed to parse frame', e);
+        }
+      };
+
+      socket.onclose = () => {
+        setConnectionState('disconnected', 'Disconnected');
+        agentStatusDisplay.textContent = 'Offline';
+        animateWaveform(false);
+      };
+
+      socket.onerror = () => {
+        setConnectionState('disconnected', 'Connection Error');
+        addMessage('System', 'Cannot connect to FastAPI backend at port 8000. Ensure uvicorn is running.', 'error');
+        animateWaveform(false);
+      };
+    }
+
+    connectBtn.addEventListener('click', handleConnect);
+
+    const slotsFeed = document.getElementById('slotsFeed');
+
+    async function fetchUpcomingAvailability(bizId) {
+      if (!slotsFeed) return;
+      const meta = tenantInfo[bizId];
+      if (!meta || !meta.hasAvailability) {
+        availabilityCard.hidden = true;
+        return;
+      }
+      availabilityCard.hidden = false;
+      slotsFeed.innerHTML = '<div style="color: var(--text-dim); text-align: center; padding: 1rem 0;">Fetching 7-day schedule…</div>';
+      try {
+        const host = window.location.hostname || '127.0.0.1';
+        const res = await fetch(`http://${host}:8000/availability/${bizId}?days=7`);
+        const data = await res.json();
+        if (data.available_slots && data.available_slots.length > 0) {
+          slotsFeed.innerHTML = data.available_slots.slice(0, 15).map(slot => {
+            const dt = new Date(slot);
+            const dateStr = dt.toLocaleDateString([], { weekday: 'short', month: 'numeric', day: 'numeric' });
+            const timeStr = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return `<div style="display: flex; justify-content: space-between; padding: 0.25rem 0.4rem; background: rgba(16, 185, 129, 0.08); border-radius: 4px; border-left: 2px solid var(--accent-emerald);">
+              <span style="color: var(--text-muted);">${dateStr}</span>
+              <span style="color: #34d399; font-weight: 600;">${timeStr}</span>
+            </div>`;
+          }).join('') + (data.available_slots.length > 15 ? `<div style="text-align: center; color: var(--text-dim); font-size: 0.7rem; padding-top: 0.25rem;">+${data.available_slots.length - 15} more upcoming slots</div>` : '');
+        } else {
+          slotsFeed.innerHTML = '<div style="color: var(--accent-amber); text-align: center; padding: 1rem 0;">No upcoming open slots in next 7 days.</div>';
+        }
+      } catch (e) {
+        slotsFeed.innerHTML = '<div style="color: var(--text-dim); text-align: center; padding: 1rem 0;">Backend offline.</div>';
+      }
+    }
+
+    businessSelect.addEventListener('change', () => {
+      const selectedId = businessSelect.value;
+      renderSelection(selectedId);
+      fetchUpcomingAvailability(selectedId);
+      if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+        handleConnect(true);
+      }
+    });
+
+    // Initial fetch on page load
+    fetchUpcomingAvailability(businessSelect.value);
+
+    inputForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = messageInput.value.trim();
+      if (!text || !socket || socket.readyState !== WebSocket.OPEN) return;
+
+      addMessage('Caller', text, 'user');
+      socket.send(JSON.stringify({ message: text }));
+      messageInput.value = '';
+    });
+
+    // Browser Speech-to-Text via Web Speech Recognition
+    let recognition = null;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        micBtn.classList.add('recording');
+        micBtn.title = 'Listening… speak now';
+      };
+
+      recognition.onresult = (event) => {
+        const transcriptText = event.results[0][0].transcript;
+        messageInput.value = transcriptText;
+        inputForm.dispatchEvent(new Event('submit'));
+      };
+
+      recognition.onerror = () => {
+        micBtn.classList.remove('recording');
+      };
+
+      recognition.onend = () => {
+        micBtn.classList.remove('recording');
+      };
+    }
+
+    micBtn.addEventListener('click', () => {
+      if (!recognition) {
+        alert('Web Speech API is not supported in this browser. You can type in the input box.');
+        return;
+      }
+      try {
+        recognition.start();
+      } catch (err) {
+        recognition.stop();
+      }
+    });
+  </script>
+</body>
+</html>

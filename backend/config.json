@@ -1,0 +1,79 @@
+{
+  "hua_lu_peking_duck": {
+    "business_name": "Hua Lu Peking Duck",
+    "knowledge_base_summary": "Hua Lu Peking Duck is a Chinese restaurant in Melbourne CBD. It serves Peking duck, dim sum, and banquet menus. Dinner bookings are available Tuesday to Sunday from 5:30 PM. The restaurant can accommodate dietary requests when noted with the booking.",
+    "required_variables": ["name", "phone", "party_size", "booking_date", "booking_time"],
+    "availability": {
+      "slot_duration_minutes": 60,
+      "hours": {
+        "Tuesday": {"open": "17:30", "close": "22:00"},
+        "Wednesday": {"open": "17:30", "close": "22:00"},
+        "Thursday": {"open": "17:30", "close": "22:00"},
+        "Friday": {"open": "17:30", "close": "22:00"},
+        "Saturday": {"open": "17:30", "close": "22:00"},
+        "Sunday": {"open": "17:30", "close": "21:30"}
+      },
+      "booked_slots": [
+        "2026-10-02T18:30:00",
+        "2026-10-03T19:00:00",
+        "2026-10-04T20:00:00"
+      ]
+    }
+  },
+  "apex_auto_works": {
+    "business_name": "Apex Auto Works",
+    "knowledge_base_summary": "Apex Auto Works is an independent vehicle service and repair workshop. It offers logbook servicing, brake repairs, tyre work, diagnostics, and roadworthy inspections. Standard workshop hours are Monday to Friday, 8:00 AM to 5:30 PM. Customers should provide their vehicle registration when requesting a booking.",
+    "required_variables": ["name", "phone", "vehicle_registration", "service_needed", "preferred_date"],
+    "availability": {
+      "slot_duration_minutes": 60,
+      "hours": {
+        "Monday": {"open": "08:00", "close": "17:30"},
+        "Tuesday": {"open": "08:00", "close": "17:30"},
+        "Wednesday": {"open": "08:00", "close": "17:30"},
+        "Thursday": {"open": "08:00", "close": "17:30"},
+        "Friday": {"open": "08:00", "close": "17:30"}
+      },
+      "booked_slots": [
+        "2026-10-02T09:00:00",
+        "2026-10-02T10:00:00",
+        "2026-10-05T13:00:00"
+      ]
+    }
+  },
+  "insurance_comparison": {
+    "business_name": "Insurance Comparison",
+    "persona_type": "document",
+    "required_variables": [],
+    "document_files": [
+      "insurance-comparisons-au/aami-comprehensive-car-insurance-pds.md",
+      "insurance-comparisons-au/aami-third-party-property-damage-car-insurance-pds.md",
+      "insurance-comparisons-au/RACV-motor-insurance-pds-current.md",
+      "insurance-comparisons-au/RACV-motor-insurance-complete-care-pds-current.md"
+    ],
+    "default_comparison_files": [
+      "insurance-comparisons-au/aami-comprehensive-car-insurance-pds.md",
+      "insurance-comparisons-au/RACV-motor-insurance-pds-current.md"
+    ],
+    "alternate_document_triggers": {
+      "insurance-comparisons-au/aami-third-party-property-damage-car-insurance-pds.md": ["third party", "fire and theft"],
+      "insurance-comparisons-au/RACV-motor-insurance-complete-care-pds-current.md": ["complete care"]
+    },
+    "comparison_search_terms": "motor insurance cover exclusions excess premiums claims",
+    "document_context": "Answer only from these repository policy documents. Default to comparing AAMI Comprehensive Car Insurance and RACV Motor Insurance; clearly name them and do not call them equivalent. Use the AAMI Third Party Property Damage and RACV Complete Care documents when the user asks about those variants. The AAMI PDSs were prepared on 18 September 2020 (the comprehensive PDS says it is from 15 December 2020); the RACV PDSs have a base date of 2 August 2022 and an SPDS dated 13 July 2026, with stated application dates for new business and renewals. The supplied files have not been independently verified as current."
+  },
+  "credit_card_comparison": {
+    "business_name": "Credit Card Comparison",
+    "persona_type": "document",
+    "required_variables": [],
+    "document_files": [
+      "banking-comparisons-au/NAB-credit-card-terms-and-conditions.md",
+      "banking-comparisons-au/cba-cc2-cou.md"
+    ],
+    "default_comparison_files": [
+      "banking-comparisons-au/NAB-credit-card-terms-and-conditions.md",
+      "banking-comparisons-au/cba-cc2-cou.md"
+    ],
+    "comparison_search_terms": "credit card interest rates fees repayment interest free purchases cash advances",
+    "document_context": "Answer only from these repository terms documents and compare them at the document level. Do not imply that either document applies to every card from its bank or claim a named-card comparison that the sources do not establish. The NAB personal-card terms say they are effective from 18 April 2024; the CommBank Conditions of Use is dated 29 September 2026 and states that it does not apply to all CommBank cards. The supplied files have not been independently verified as current."
+  }
+}

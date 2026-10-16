@@ -1,0 +1,10 @@
+fastapi<1,>=0.115
+httpx<1,>=0.27
+pydantic-settings<3,>=2.6
+uvicorn[standard]<1,>=0.30
+websockets<17,>=13
+
+[dev]
+pytest<9,>=8
+pytest-asyncio<1,>=0.24
+markitdown[pdf]==0.1.8
